@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  
+ <!-- userVo 모든 게시물을 전달 -->
+ <mapper namespace="com.site.mapper.UserMapper">
+ 
+ 	<!--  로그인 email,password 검색 -->
+ 	<select id="selectLogin" resultType="com.site.vo.UserVo">
+ 		SELECT *
+ 		FROM   USERS
+ 		WHERE  EMAIL = #{email}
+ 		AND    PASSWORD = #{password}
+ 	</select>
+ 	
+ 	<!-- 이메일 찾기 -->
+ 	<select id="selectSearchEmail" resultType="com.site.vo.UserVo">
+ 		SELECT *
+ 		FROM   USERS
+ 		WHERE  NAME = #{name}
+ 		AND	   PHONE_NO = #{phone_no}
+ 	</select>
+ 	
+ 	<!-- 비밀번호 찾기 -->
+ 	<select id="selectSearchPassword" resultType="com.site.vo.UserVo">
+ 		SELECT *
+ 		FROM   USERS
+ 		WHERE  NAME = #{name}
+ 		AND	   EMAIL = #{email}
+ 	</select>
+ 	
+ 	<!-- 회원가입 -->
+ 	<insert id="insertUserDo">
+ 		INSERT INTO USERS
+ 		VALUES
+ 		(#{email}, SEQ_USERS_NO.NEXTVAL, #{password},
+ 		#{name}, #{phone_no}, #{birth}, 1,
+ 		#{address1}, #{address2}, #{zipcode})
+ 	</insert>
+ 	
+ 	<!-- 아이디 중복체크 --> 
+ 	<select id="emailCheck" resultType="int">
+ 		SELECT COUNT(*)
+ 		FROM   USERS
+ 		WHERE  EMAIL = #{email}
+ 	</select>
+ 	
+ 	<!-- 임시 비밀번호 저장 -->
+ 	<update id="updatePassword">
+ 		UPDATE USERS
+ 		SET	   PASSWORD = #{temp_password}
+ 		WHERE  EMAIL = #{email}
+ 	</update>
+ 	
+ 	<!-- 회원 전체리스트 호출 -->
+ 	<select id="selectUserList" resultType="com.site.vo.UserVo">
+ 		<![CDATA[
+	 		SELECT USER_NO, 
+	 			   EMAIL, 
+	 			   NAME, 
+	 			   PHONE_NO, 
+	 			   BIRTH
+			FROM
+			(
+				SELECT ROWNUM AS RNUM, A.*
+				FROM
+				(						
+					SELECT *
+					FROM USERS
+                    WHERE NOT ADMIN_CODE = 2
+					ORDER BY USER_NO 
+
+				) A
+			)
+			WHERE RNUM >= #{startRow}
+			AND	  RNUM <= #{endRow}
+		]]>
+ 	</select>
+ 	
+ 	<!-- 전체 회원 수 -->
+ 	<select id="selectUserCount" resultType="int">
+ 		SELECT COUNT(*)
+ 		FROM   USERS
+ 	</select>
+ 	
+ 	<!-- all로 검색한 회원 리스트 -->
+ 	<select id="selectUserListSearchAll" resultType="com.site.vo.UserVo">
+		<![CDATA[
+			SELECT USER_NO, 
+	 			   EMAIL, 
+	 			   NAME, 
+	 			   PHONE_NO, 
+	 			   BIRTH
+			FROM
+			(
+				SELECT ROWNUM AS RNUM, A.*
+				FROM
+				(						
+					SELECT *
+					FROM USERS
+                    WHERE NOT ADMIN_CODE = 2
+                    AND  (NAME LIKE '%' || #{search} || '%'
+                    OR	  EMAIL LIKE '%' || #{search} || '%'
+                    OR	  PHONE_NO LIKE '%' || #{search} || '%')
+					ORDER BY USER_NO 
+
+				) A
+			)
+			WHERE RNUM >= #{startRow}
+			AND	  RNUM <= #{endRow}
+	    ]]>
+	</select>
+	
+	<!-- all로 검색한 회원 수 -->
+	<select id="selectUserSearchAllCount" resultType="int">
+		<![CDATA[
+			SELECT COUNT(*)
+			FROM USERS
+			WHERE NOT ADMIN_CODE = 2
+			AND  (NAME LIKE '%' || #{search} || '%'
+			OR	  EMAIL LIKE '%' || #{search} || '%'
+			OR	  PHONE_NO LIKE '%' || #{search} || '%')
+		]]>
+	</select>
+	
+	<!-- category별로 검색한 회원 리스트 -->
+	<select id="selectUserListSearch" resultType="com.site.vo.UserVo">
+		<![CDATA[
+			SELECT USER_NO, 
+	 			   EMAIL, 
+	 			   NAME, 
+	 			   PHONE_NO, 
+	 			   BIRTH
+			FROM
+			(
+				SELECT ROWNUM AS RNUM, A.*
+				FROM
+				(						
+					SELECT *
+					FROM USERS
+                    WHERE NOT ADMIN_CODE = 2
+		]]>
+		<choose>
+			<when test="category=='name'">				<!-- 이름별 검색 -->
+				<![CDATA[			
+					AND NAME LIKE '%' || #{search} || '%'
+			    ]]>
+	    	</when>
+	    	<when test="category=='email'">				<!-- 이메일별 검색 -->
+				<![CDATA[		
+					AND EMAIL LIKE '%' || #{search} || '%'
+			    ]]>
+	    	</when>
+	    	<when test="category=='phone_no'">			<!-- 전화번호별 검색 -->
+				<![CDATA[
+					AND PHONE_NO LIKE '%' || #{search} || '%'	
+			    ]]>
+	    	</when>
+	    </choose>
+	    	<![CDATA[
+	    			ORDER BY USER_NO
+	    			) A
+				)
+			WHERE RNUM >= #{startRow}
+			AND	  RNUM <= #{endRow}
+			]]>
+	</select>
+	
+ 	<!-- category별로 검색한 회원 수 -->
+	<select id="selectUserSearchCount" resultType="int">
+		<![CDATA[   
+			SELECT COUNT(*)
+			FROM USERS
+			WHERE NOT ADMIN_CODE = 2
+	    ]]>
+	    <choose>
+			<when test="category=='name'">				<!-- 이름별 검색 --> 
+				<![CDATA[ 
+					AND NAME LIKE '%' || #{search} || '%'
+		    	]]>
+	    	</when>
+	    	<when test="category=='email'">				<!-- 이메일별 검색 --> 
+				<![CDATA[ 
+					AND EMAIL LIKE '%' || #{search} || '%'
+		    	]]>
+	    	</when>
+	    	<when test="category=='phone_no'">			<!-- 전화번호별 검색 --> 
+				<![CDATA[ 
+					AND PHONE_NO LIKE '%' || #{search} || '%'
+		    	]]>
+	    	</when>
+	    </choose>
+	</select>
+ 	
+ 	
+ 	<!--  회원정보수정페이지 호출  -->
+	<select id = "selectUserModify" resultType="com.site.vo.UserVo">
+		SELECT * 
+		FROM   USERS
+		WHERE  EMAIL = #{email}
+	</select>
+	
+ 	<!-- 회원정보수정 저장 -->
+	<update id="updateUserModifyDo">
+		UPDATE USERS 
+		SET    PASSWORD = #{password},
+			   NAME = #{name},
+			   PHONE_NO = #{phone_no},
+			   ADDRESS1 = #{address1},
+			   ADDRESS2 = #{address2},
+			   ZIPCODE = #{zipcode}
+		WHERE  EMAIL = #{email}
+	</update>
+ 	
+ 
+ </mapper>

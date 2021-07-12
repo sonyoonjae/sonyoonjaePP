@@ -1,0 +1,62 @@
+@charset "UTF-8";
+
+*{ margin:0; padding:0; font-family: 'Noto Sans KR', sans-serif;}
+
+ul,ol{ list-style-type: none; }
+
+a#nav_a {color:#101010; text-decoration:none; font-size: 15px;}
+
+nav{ width:100%; height: 81px; border-bottom: 1px solid black;  background:white;
+	position: relative;}
+
+ /* 맨 왼쪽에 runner'z 로고 */
+ #indexIcon{ width: 200px; height: 30px; 
+	background: url('../images/ico_set.png')-320px -385px no-repeat;
+	background-size: 800px 800px; position: absolute; 
+	left:45px; top:25px; } 
+
+/* nav>ul:nth-child(2)들이 있어야 li들이 가로로 정렬됨 */	
+nav>ul:nth-child(2){ width: 454px; height: 40px; 
+	margin: 0 auto; position: relative; top:23px;}
+nav>ul:nth-child(2) li{ float:left; margin: 0 28.5px; color: #101010; font-weight: 700; 
+	font-size: 22px; line-height: 32px;}
+
+
+/*nav>ul:nth-child(3)들이 있어야 장바구니라는 글자가 가로로 정렬이됨*/	
+nav>ul:nth-child(3){ width:130px; height: 52px; position: relative; 
+	float: right; top:-25px;}
+nav>ul:nth-child(3) li{ float:left; margin-left: 20px; color: #101010; font-weight: 700; 
+	font-size: 12px; } 
+	
+/*장바구니 그림*/ 
+nav>ul:nth-child(3)>li:nth-child(1)>a{ width:32px; height: 32px; display: inline-block;
+	background: url('../images/ico_set.png') -584px -320px no-repeat; 
+	background-size: 800px 800px; letter-spacing: -2px;} 
+	
+/*관리자페이지 그림*/	
+a#admin_icon {
+    width: 32px;
+    height: 32px;
+    display: inline-block;
+    background: url(../images/ico_set.png) -543px -320px no-repeat;
+    background-size: 800px 800px;
+    letter-spacing: -2px;
+}
+	
+/*장바구니 글 색 변경*/
+nav>ul:nth-child(3)>li>a:link{ color:black;}
+
+/* 그림 아래 장바구니라고 써져있는 글 부분이 그림이랑 안겹치게 하는 용도
+   태그의 위치를 살짝 변경하고 싶을 때 position: relative를 사용
+   이제 top(위), right(오른쪽), bottom(아래), left(왼쪽) 속성을 사용해 위치 조절이 가능*/
+nav>ul:nth-child(3)>li:nth-child(1)>a>span{ display: block; width: 59px; height: 20px; 
+	 position: relative; top:30px; left:-5px; font-size: 15px;}
+	 
+/*  메뉴찾기 그림
+	nav>ul:nth-child(3)>li:nth-child(2)>a{ width:32px; height: 32px; display: inline-block;
+	background: url('../images/ico_set.png') -628px -320px no-repeat; 
+	background-size: 800px 800px; letter-spacing: -2px;} */
+	
+
+nav>ul:nth-child(3)>li:nth-child(2)>a>span{ display: block; width: 50px; height: 20px; 
+	 position: relative; top:30px; left:-5px; }

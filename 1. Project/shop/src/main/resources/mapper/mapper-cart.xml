@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.site.mapper.CartMapper">
+
+	<!-- 장바구니 리스트 호출 -->
+	<select id="selectCartList" resultType="com.site.vo.CartVo">
+		SELECT P.PRODUCT_MAIN_IMAGE,
+			   C.CART_NO,
+			   C.PRODUCT_NO,
+			   C.EMAIL,
+		       P.PRODUCT_NAME,
+		       P.PRODUCT_PRICE,
+		       C.PRODUCT_COUNT,
+		       C.PRODUCT_SIZE,
+		       (P.PRODUCT_PRICE * C.PRODUCT_COUNT) AS PRODUCT_TOTAL_PRICE
+		FROM   PRODUCT P, CART C
+		WHERE  P.PRODUCT_NO = C.PRODUCT_NO
+	</select>
+	
+	<!-- 장바구니 리스트 이메일로 불러오기 -->
+	<select id="selectCartListWithEmail" resultType="com.site.vo.CartVo">
+	<![CDATA[
+	SELECT     P.PRODUCT_MAIN_IMAGE,
+			   C.CART_NO,
+			   C.PRODUCT_NO,
+			   C.EMAIL,
+		       P.PRODUCT_NAME,
+		       P.PRODUCT_PRICE,
+		       C.PRODUCT_COUNT,
+		       C.PRODUCT_SIZE,
+		       (P.PRODUCT_PRICE * C.PRODUCT_COUNT) AS PRODUCT_TOTAL_PRICE
+		FROM   PRODUCT P, CART C
+		WHERE  P.PRODUCT_NO = C.PRODUCT_NO 
+		AND    C.EMAIL = #{email}
+	]]>
+	</select>
+	
+	<!-- 장바구니 한 개 삭제 -->
+	<delete id="deleteCartDelete">
+		DELETE CART
+		WHERE  EMAIL = #{email}
+		AND   CART_NO = #{cart_no}
+	</delete>
+	
+	<!-- 장바구니 전체삭제 -->
+	<delete id="deleteCartAllDelete">
+		DELETE CART
+		WHERE EMAIL = #{email}
+		
+	</delete>
+	
+
+	<!-- 장바구니 추가 -->
+	<insert id="cartInsertDo">
+		INSERT INTO CART
+		VALUES
+		(SEQ_CART_NO.NEXTVAL, #{email}, #{product_no}, #{product_count}, #{product_size})
+	</insert>
+	
+	
+	<!-- 선택구매 페이지 호출 -->
+	<select id="selectPayList" resultType="com.site.vo.CartVo">
+		SELECT P.PRODUCT_MAIN_IMAGE,
+			   C.CART_NO,
+			   C.PRODUCT_NO,
+			   C.EMAIL,
+		       P.PRODUCT_NAME,
+		       P.PRODUCT_PRICE,
+		       C.PRODUCT_COUNT,
+		       C.PRODUCT_SIZE,
+		       (P.PRODUCT_PRICE * C.PRODUCT_COUNT) AS PRODUCT_TOTAL_PRICE
+		FROM   PRODUCT P, CART C
+		WHERE  P.PRODUCT_NO = C.PRODUCT_NO
+		AND	   C.EMAIL = #{email}
+		AND    C.CART_NO = #{cart_no}
+	</select>
+	
+	<!-- 전체구매 페이지 호출 -->
+	<select id="selectAllPayList" resultType="com.site.vo.CartVo">
+		SELECT P.PRODUCT_MAIN_IMAGE,
+			   C.CART_NO,
+			   C.PRODUCT_NO,
+			   C.EMAIL,
+		       P.PRODUCT_NAME,
+		       P.PRODUCT_PRICE,
+		       C.PRODUCT_COUNT,
+		       C.PRODUCT_SIZE,
+		       (P.PRODUCT_PRICE * C.PRODUCT_COUNT) AS PRODUCT_TOTAL_PRICE
+		FROM   PRODUCT P, CART C
+		WHERE  P.PRODUCT_NO = C.PRODUCT_NO
+		AND	   C.EMAIL = #{email}
+	</select>
+	
+	
+</mapper>

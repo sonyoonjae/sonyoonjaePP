@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.bank.banking.BankMapper">
+
+
+	<select id="getUser" resultType="org.bank.data.UserVO">
+	<![CDATA[
+	select *
+	from users
+	where USERID=#{userID}
+	]]>
+	</select>
+
+	<select id="getBalance" resultType="BigDecimal">
+	<![CDATA[
+	select balance
+	from accounts
+	where account_number=#{account_number}
+	]]>
+	</select>
+
+	<select id="getAccount" resultType="org.bank.data.AccountVO">
+	<![CDATA[
+		select *
+		from accounts
+		where account_number=#{account_number}
+	]]>
+	</select>
+
+	<update id="payment">
+	<![CDATA[
+	update accounts 
+	set balance=balance-#{price}
+	where account_number=#{account_number}
+	]]>
+	</update>
+
+	<insert id="logging">
+		<selectKey resultType="BigDecimal" keyProperty="logno" order="BEFORE">
+			<![CDATA[
+			select seq_logno.nextval
+			from dual
+			]]>
+		</selectKey>
+		
+		<![CDATA[
+		insert into 
+		logs(logno,userid,means,card_or_account_number,deposit,balance,mall_id,mall_account_number,transaction_date,etc)
+		values(#{logno},#{userID},#{means},#{card_or_account_number},#{deposit},#{balance},#{mall_ID},#{mall_account_number},sysdate,#{etc})
+		]]>
+	</insert>
+
+	<select id="getCard" resultType="org.bank.data.CardVO">
+	<![CDATA[
+	select *
+	from cards
+	where card_number=#{card_number}
+	]]>
+	</select>
+	
+	<update id="receive">
+	<![CDATA[
+	update accounts
+	set balance=balance+#{price}
+	where account_number=#{mall_account_number}
+	]]>
+	</update>
+	
+	<select id="getPG" resultType="org.bank.data.PGVO">
+	<![CDATA[
+	select *
+	from paygates
+	]]>
+	</select>
+
+</mapper>

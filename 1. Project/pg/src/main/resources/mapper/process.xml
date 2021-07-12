@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.pg.process.ProcessMapper">
+	<select id="getMall" resultType="org.pg.data.MallVO">
+	<![CDATA[
+	select *
+	from malls
+	where mall_code=#{mall_code}
+	]]>
+	</select>
+	<select id="getUser" resultType="org.pg.data.UserVO">
+	<![CDATA[
+	select *
+	from users
+	where userid=#{id}
+	]]>
+	</select>
+
+	<select id="getUserByEmail" resultType="org.pg.data.UserVO">
+	<![CDATA[
+	select *
+	from users
+	where email=#{email}
+	]]>
+	</select>
+
+	<insert id="join" parameterType="org.pg.data.UserVO">
+	<![CDATA[
+	insert into users
+	values(#{userID},#{password},#{email},#{phone_number},#{name})
+	]]>
+	</insert>
+
+	<insert id="joinCodeGeneration">
+	<![CDATA[
+	insert into certify(email,code)
+	values(#{email},#{code})
+	]]>
+	</insert>
+
+	<select id="getCertify" resultType="org.pg.data.CertifyVO">
+	<![CDATA[
+	select *
+	from certify
+	where email=#{email}
+	]]>
+	</select>
+
+	<delete id="deleteCertifyingCode">
+	<![CDATA[
+	delete from certify
+	where email=#{email}
+	]]>
+	</delete>
+
+	<insert id="insertNewUser">
+	<![CDATA[
+	insert into users(userid,password,email,phone_number,name)
+	values(#{id},#{password},#{email},#{phone_number},#{name})
+	]]>
+	</insert>
+
+	<select id="getPaymentWays" resultType="org.pg.data.PaymentWayVO">
+	<![CDATA[
+	select *
+	from payment_ways
+	where userid=#{id}
+	]]>
+	</select>
+
+	<select id="getBanks" resultType="org.pg.data.BankVO">
+	<![CDATA[
+	select *
+	from banks
+	]]>
+	</select>
+
+
+	<insert id="insertNewPaymentWay" parameterType="org.pg.data.PaymentWayVO">
+	<![CDATA[
+	insert into payment_ways
+	values(SEQ_PAYMENT_NO.nextval,#{userID},#{bank_name},#{means},#{card_or_account_number},#{cvc},#{end_year, jdbcType=INTEGER},#{end_month,jdbcType=INTEGER})
+	]]>
+	</insert>
+
+	<select id="getPaymentWayByCard_or_account_number" resultType="org.pg.data.PaymentWayVO">
+	<![CDATA[
+	select *
+	from payment_ways
+	where card_or_account_number=#{card_or_account_number}
+	]]>
+	</select>
+	
+	<select id="getBankURL" resultType="String">
+	<![CDATA[
+	select URL
+	from banks
+	where bank_name=#{bank_name}
+	]]>
+	</select>
+</mapper>

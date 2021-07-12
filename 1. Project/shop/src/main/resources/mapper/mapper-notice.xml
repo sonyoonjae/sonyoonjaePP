@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.site.mapper.NoticeMapper">
+
+	<!-- 전체리스트 호출 -->
+	<select id="selectNoticeList" resultType ="com.site.vo.NoticeVo">
+		<![CDATA[
+				SELECT *
+				FROM
+				(
+					SELECT ROWNUM AS RNUM, A.*
+					FROM
+					(
+						SELECT *
+						FROM NOTICE
+						ORDER BY NOTICE_DATE DESC
+					) A
+				)
+				WHERE RNUM >= #{startRow}
+				AND   RNUM <= #{endRow}
+		]]>
+	</select>
+	
+	<!-- 전체게시글 수 -->
+	<select id="selectNoticeCount" resultType="int">
+		   SELECT COUNT(*)
+		   FROM   NOTICE
+	</select>
+	
+	<!-- 조회수 증가 -->
+	<update id="updatehit">	
+		UPDATE NOTICE
+		SET	   NOTICE_HIT = NOTICE_HIT + 1
+		WHERE  NOTICE_NO = #{notice_no}
+	</update>
+	
+	<!-- 뷰페이지 호출 -->
+	<select id ="selectNoticeView" resultType="com.site.vo.NoticeVo">
+		SELECT *
+		FROM  NOTICE
+		WHERE NOTICE_NO = #{notice_no}
+	</select>
+	
+	<!-- 글쓰기 저장 -->
+	<insert id ="insertNoticeWriteDo">
+		<![CDATA[
+			INSERT INTO NOTICE
+			VALUES
+			(SEQ_NOTICE_NO.NEXTVAL, #{email},
+			#{notice_title}, #{notice_content},
+			SYSDATE, 0, #{notice_image})
+		]]>   
+	</insert>
+	
+	<!-- 게시글 삭제 -->
+	<delete id="deleteNoticeDelete">	
+		DELETE
+		FROM  NOTICE
+		WHERE NOTICE_NO = #{notice_no}
+	</delete>
+	
+	<!-- 수정페이지 호출 -->
+	<select id="selectNoticeModify" resultType="com.site.vo.NoticeVo">
+		SELECT *
+		FROM  NOTICE
+		WHERE NOTICE_NO = #{notice_no}
+	</select>
+	
+	<!-- 수정페이지 저장 -->
+	<update id="updateNoticeModifyDo">
+		UPDATE NOTICE
+		SET    NOTICE_TITLE = #{notice_title},
+			   NOTICE_CONTENT = #{notice_content},
+			   NOTICE_DATE = SYSDATE,
+			   NOTICE_IMAGE = #{notice_image}
+		WHERE  NOTICE_NO = #{notice_no}
+	</update>
+
+
+</mapper>

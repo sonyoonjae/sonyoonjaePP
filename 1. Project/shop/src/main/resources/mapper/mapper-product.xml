@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.site.mapper.ProductMapper">
+
+	<!-- 상품 전체리스트 호출 -->
+	<select id="selectProductList" resultType="com.site.vo.ProductVo">
+		<![CDATA[
+			SELECT *
+				FROM
+				(
+					SELECT ROWNUM AS RNUM, A.*
+					FROM
+					(						
+		]]>
+		<choose>
+			<!-- 최신순 정렬 -->
+			<when test="sort=='productDateDesc'">		
+				<![CDATA[
+						SELECT P.*, I.PRODUCT_TOTAL_STOCK
+						FROM PRODUCT P, PRODUCT_INVENTORY I
+						WHERE P.PRODUCT_NO = I.PRODUCT_NO
+						ORDER BY P.PRODUCT_DATE DESC
+					
+				]]>
+			</when>
+
+			<!-- 낮은가격순 정렬 -->
+			<when test="sort=='productPriceAsc'">		
+				<![CDATA[
+						SELECT P.*, I.PRODUCT_TOTAL_STOCK
+						FROM PRODUCT P, PRODUCT_INVENTORY I
+						WHERE P.PRODUCT_NO = I.PRODUCT_NO
+						ORDER BY P.PRODUCT_PRICE
+				]]>
+			</when>
+
+			<!-- 높은가격순 정렬 -->
+			<when test="sort=='productPriceDesc'">		
+				<![CDATA[
+						SELECT P.*, I.PRODUCT_TOTAL_STOCK
+						FROM PRODUCT P, PRODUCT_INVENTORY I
+						WHERE P.PRODUCT_NO = I.PRODUCT_NO
+						ORDER BY P.PRODUCT_PRICE DESC
+				]]>
+			</when>
+
+			<!-- 판매량순 정렬 -->
+			<when test="sort=='productSales'">			
+				<![CDATA[
+						SELECT P.*, I.PRODUCT_TOTAL_STOCK
+						FROM PRODUCT P, PRODUCT_INVENTORY I
+						WHERE P.PRODUCT_NO = I.PRODUCT_NO
+						ORDER BY I.PRODUCT_TOTAL_STOCK
+				]]>
+			</when>
+			
+			<!-- 평점순 정렬 -->
+			<when test="sort=='productRatings'">			
+				<![CDATA[
+                        SELECT P.PRODUCT_NO,
+                        	   P.PRODUCT_MAIN_IMAGE,
+                        	   P.PRODUCT_PRICE,
+                        	   P.PRODUCT_NAME,
+                        	   I.PRODUCT_TOTAL_STOCK,
+                        	   ROUND(AVG(NVL(R.REVIEW_RATINGS, 0)), 1) RATINGS
+                        	   
+                        FROM   REVIEW R, PRODUCT P, PRODUCT_INVENTORY I
+                        
+                        WHERE  R.PRODUCT_NO(+) = P.PRODUCT_NO
+                        AND	   P.PRODUCT_NO = I.PRODUCT_NO
+                        
+                      GROUP BY P.PRODUCT_NO,
+                      		   P.PRODUCT_MAIN_IMAGE,
+                      		   P.PRODUCT_PRICE,
+                      		   P.PRODUCT_NAME,
+                      		   I.PRODUCT_TOTAL_STOCK
+                      		   
+                      ORDER BY RATINGS DESC
+                        		 
+				]]>
+			</when>
+			
+			<otherwise>
+			<![CDATA[
+						SELECT P.*, I.PRODUCT_TOTAL_STOCK
+						FROM PRODUCT P, PRODUCT_INVENTORY I
+						WHERE P.PRODUCT_NO = I.PRODUCT_NO
+						ORDER BY P.PRODUCT_DATE DESC
+				]]>
+			</otherwise>
+		</choose>
+		<![CDATA[
+					) A
+				)
+				WHERE RNUM >= #{startRow}
+				AND	  RNUM <= #{endRow}
+		]]>
+	</select>
+
+	<!-- 전체 상품 수 -->
+	<select id="selectProductCount" resultType="int">
+		SELECT COUNT(*)
+		FROM   PRODUCT
+	</select>
+
+	<!-- 검색리스트 호출 -->
+	<select id="selectProductListSearch" resultType="com.site.vo.ProductVo">
+		<![CDATA[
+				SELECT *
+				FROM
+				(
+					SELECT ROWNUM AS RNUM, A.*
+					FROM
+					(
+		]]>
+		<if test="search != null and search != '' ">
+			<choose>
+
+				<!-- 최신순 정렬 -->
+				<when test="sort=='productDateDesc'">		
+					<![CDATA[
+							SELECT P.*, I.PRODUCT_TOTAL_STOCK
+							FROM PRODUCT P, PRODUCT_INVENTORY I
+							WHERE P.PRODUCT_NO = I.PRODUCT_NO
+							AND	  (P.ST_NO LIKE '%' || #{search} || '%'
+							OR	  P.PRODUCT_NAME LIKE '%' || #{search} || '%')
+							ORDER BY P.PRODUCT_DATE DESC		
+					]]>
+				</when>
+
+				<!-- 낮은가격순 정렬 -->
+				<when test="sort=='productPriceAsc'">		
+					<![CDATA[
+							SELECT P.*, I.PRODUCT_TOTAL_STOCK
+							FROM PRODUCT P, PRODUCT_INVENTORY I
+							WHERE P.PRODUCT_NO = I.PRODUCT_NO
+							AND	  (P.ST_NO LIKE '%' || #{search} || '%'
+							OR	  P.PRODUCT_NAME LIKE '%' || #{search} || '%')
+							ORDER BY P.PRODUCT_PRICE		
+					]]>
+				</when>
+
+				<!-- 높은가격순 정렬 -->
+				<when test="sort=='productPriceDesc'">		
+					<![CDATA[
+							SELECT P.*, I.PRODUCT_TOTAL_STOCK
+							FROM PRODUCT P, PRODUCT_INVENTORY I
+							WHERE P.PRODUCT_NO = I.PRODUCT_NO
+							AND	  (P.ST_NO LIKE '%' || #{search} || '%'
+							OR	  P.PRODUCT_NAME LIKE '%' || #{search} || '%')
+							ORDER BY P.PRODUCT_PRICE DESC	
+					]]>
+				</when>
+
+				<!-- 판매량순 정렬 -->
+				<when test="sort=='productSales'">			
+					<![CDATA[
+							SELECT P.*, I.PRODUCT_TOTAL_STOCK
+							FROM PRODUCT P, PRODUCT_INVENTORY I
+							WHERE P.PRODUCT_NO = I.PRODUCT_NO
+							AND ( P.ST_NO LIKE '%' || #{search} || '%'
+							OR	  P.PRODUCT_NAME LIKE '%' || #{search} || '%' )
+							ORDER BY I.PRODUCT_TOTAL_STOCK		
+					]]>
+				</when>
+				
+				<!-- 평점순 정렬 -->
+				<when test="sort=='productRatings'">			
+					<![CDATA[
+							SELECT P.PRODUCT_NO,
+                        	   P.PRODUCT_MAIN_IMAGE,
+                        	   P.PRODUCT_PRICE,
+                        	   P.PRODUCT_NAME,
+                        	   I.PRODUCT_TOTAL_STOCK,
+                        	   ROUND(AVG(NVL(R.REVIEW_RATINGS, 0)), 1) RATINGS
+                        	   
+                        FROM   REVIEW R, PRODUCT P, PRODUCT_INVENTORY I
+                        
+                        WHERE  R.PRODUCT_NO(+) = P.PRODUCT_NO
+                        AND	   P.PRODUCT_NO = I.PRODUCT_NO
+                        AND  ( P.ST_NO LIKE '%' || #{search} || '%'
+						OR	   P.PRODUCT_NAME LIKE '%' || #{search} || '%' )	   
+                        
+                      GROUP BY P.PRODUCT_NO,
+                      		   P.PRODUCT_MAIN_IMAGE,
+                      		   P.PRODUCT_PRICE,
+                      		   P.PRODUCT_NAME,
+                      		   I.PRODUCT_TOTAL_STOCK
+                      		   
+                      ORDER BY RATINGS DESC		
+					]]>
+				</when>
+
+				<otherwise>
+					<![CDATA[
+							SELECT P.*, I.PRODUCT_TOTAL_STOCK
+							FROM PRODUCT P, PRODUCT_INVENTORY I
+							WHERE P.PRODUCT_NO = I.PRODUCT_NO
+							AND	  (P.ST_NO LIKE '%' || #{search} || '%'
+							OR	  P.PRODUCT_NAME LIKE '%' || #{search} || '%')
+							ORDER BY P.PRODUCT_DATE DESC	
+						]]>
+				</otherwise>
+
+			</choose>
+		</if>
+		<![CDATA[
+					) A
+				)
+				WHERE RNUM >= #{startRow}
+				AND	  RNUM <= #{endRow}
+		]]>
+	</select>
+
+	<!-- 검색된 상품 수 -->
+	<select id="selectProductSearchCount" resultType="int">
+		SELECT COUNT(*)
+		FROM PRODUCT
+		WHERE ST_NO LIKE '%' || #{search} || '%'
+		OR PRODUCT_NAME
+		LIKE '%' || #{search} || '%'
+	</select>
+
+	<!-- 상세뷰페이지 호출 -->
+	<select id="selectProductView" resultType="com.site.vo.ProductVo">
+		<![CDATA[	
+			SELECT *
+			FROM   PRODUCT P, PRODUCT_INVENTORY I
+			WHERE  P.PRODUCT_NO = I.PRODUCT_NO
+			AND	   P.PRODUCT_NO = #{product_no}
+	    ]]>
+	</select>
+
+	<!-- 상품등록(관리자) -->
+	<insert id="insertProductInsert" parameterType="com.site.vo.ProductVo">
+	
+		<![CDATA[			
+			INSERT ALL
+			INTO PRODUCT VALUES
+			(SEQ_PRODUCT_NO.NEXTVAL, #{st_no}, #{product_name}, SYSDATE, #{product_main_image},
+		]]>
+		<choose>
+			<when test="product_image1 == null or product_image1 == '' ">		<!-- image1이 null인 경우 1~5까지 null로 insert -->
+				'', '', '', '', '',
+			</when>
+
+			<when test="product_image2 == null or product_image2 == '' ">		<!-- image2가 null인 경우 2~5까지 null로 insert -->
+				#{product_image1}, '', '', '', '',
+			</when>
+
+			<when test="product_image3 == null or product_image3 == '' ">		<!-- image3이 null인 경우 3~5까지 null로 insert -->
+				#{product_image1}, #{product_image2}, '', '', '',
+			</when>
+
+			<when test="product_image4 == null or product_image4 == '' ">		<!-- image4가 null인 경우 4~5까지 null로 insert -->
+				#{product_image1}, #{product_image2}, #{product_image3}, '', '',
+			</when>
+
+			<when test="product_image5 == null or product_image5 == '' ">		<!-- image5가 null인 경우 5만 null로 insert -->
+				#{product_image1}, #{product_image2}, #{product_image3}, #{product_image4}, '',
+			</when>
+			<otherwise>
+				#{product_image1}, #{product_image2}, #{product_image3}, #{product_image4}, #{product_image5}, 
+			</otherwise>
+		</choose>
+		<![CDATA[
+			#{product_price}, #{product_description})
+			INTO PRODUCT_INVENTORY VALUES
+			(SEQ_PRODUCT_NO.NEXTVAL,
+			#{product_size_230} + #{product_size_240} + #{product_size_250} + #{product_size_260} +
+			#{product_size_270} + #{product_size_280} + #{product_size_290} +
+			#{product_size_300},
+			#{product_size_230}, #{product_size_240}, #{product_size_250}, #{product_size_260},
+			#{product_size_270}, #{product_size_280}, #{product_size_290},
+			#{product_size_300})
+			SELECT * FROM DUAL
+		]]>
+
+	</insert>
+	
+	<!-- 상품 수정페이지 호출(관리자) -->
+	<select id="selectProductModify" resultType="com.site.vo.ProductVo">
+		SELECT *
+		FROM   PRODUCT
+		WHERE  PRODUCT_NO = #{product_no}
+	</select>
+
+	<!-- 구매 완료 시 재고 업데이트(감소) -->
+	<update id="updateStocks" parameterType="com.site.vo.CartVo">
+	<![CDATA[
+			UPDATE PRODUCT_INVENTORY I
+            SET    I.PRODUCT_TOTAL_STOCK = 
+                   I.PRODUCT_TOTAL_STOCK - NVL(
+                              		(SELECT SUM(C.PRODUCT_COUNT) AS PRODUCT_COUNT 
+                                       FROM CART C
+                                      WHERE C.EMAIL = #{email}
+                                        AND C.PRODUCT_NO = I.PRODUCT_NO
+                                        AND C.PRODUCT_NO = #{product_no}
+                                   GROUP BY C.EMAIL, C.PRODUCT_NO), 0),
+                                   
+                   I.PRODUCT_SIZE_${product_size} = 
+                   I.PRODUCT_SIZE_${product_size} - NVL(
+                               		(SELECT SUM(C.PRODUCT_COUNT) AS PRODUCT_COUNT 
+                                       FROM CART C
+                                      WHERE C.EMAIL = #{email}
+                                        AND C.PRODUCT_NO = I.PRODUCT_NO
+                                        AND C.PRODUCT_NO = #{product_no}
+                                   GROUP BY C.EMAIL, C.PRODUCT_NO), 0)
+                                   
+			WHERE I.PRODUCT_NO = #{product_no}
+		]]>
+	</update>
+
+</mapper>

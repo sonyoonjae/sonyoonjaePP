@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.site.mapper.QnaMapper">
+
+	<!-- qna 전체리스트 호출 -->
+	<select id="selectQnaList" resultType="com.site.vo.QnaVo">
+		<![CDATA[	
+			SELECT *
+			FROM
+			(
+				SELECT ROWNUM AS RNUM, A.*
+				FROM
+				(
+					SELECT *
+					FROM   QNA
+					ORDER BY QNA_GROUP DESC, QNA_STEP
+				) A
+			)
+			WHERE RNUM >= #{startRow}
+			AND	  RNUM <= #{endRow}
+	    ]]>
+	</select>
+	
+	<!-- qna 전체글 수 -->
+	<select id="selectQnaCount" resultType="int">
+		SELECT COUNT(*)
+		FROM   QNA
+	</select>
+	
+	<!-- qna all로 검색한 리스트 호출 -->
+	<select id="selectQnaListSearchAll" resultType="com.site.vo.QnaVo">
+		<![CDATA[
+			SELECT *
+			FROM
+			(
+				SELECT ROWNUM AS RNUM, A.*
+				FROM
+				(
+					SELECT *
+					FROM   QNA
+                    WHERE (QNA_NAME LIKE '%' || #{search} || '%'
+                    OR     QNA_TITLE LIKE '%' || #{search} || '%'
+                    OR     QNA_CONTENT LIKE '%' || #{search} || '%')
+					ORDER BY QNA_GROUP DESC, QNA_STEP
+				) A
+			)
+			WHERE RNUM >= #{startRow}
+			AND	  RNUM <= #{endRow}
+	    ]]>
+	</select>
+	
+	<!-- qna all로 검색한 수 -->
+	<select id="selectQnaSearchAllCount" resultType="int">
+		<![CDATA[   
+	      SELECT COUNT(*)
+	      FROM   QNA
+	      WHERE  (QNA_TITLE LIKE '%' || #{search} || '%'
+	      OR	  QNA_CONTENT LIKE '%' || #{search} || '%'
+	      OR	  QNA_NAME LIKE '%' || #{search} || '%')
+	    ]]>
+	</select>
+	
+	<!-- qna category별 검색한 리스트 호출 -->
+	<select id="selectQnaListSearch" resultType="com.site.vo.QnaVo">
+		<![CDATA[
+			SELECT *
+			FROM
+			(
+				SELECT ROWNUM AS RNUM, A.*
+				FROM
+				(
+					SELECT *
+					FROM   QNA
+		]]>
+		<choose>
+			<when test="category=='qna_title'">		<!-- 제목별 검색 -->
+				<![CDATA[			
+					WHERE QNA_TITLE LIKE '%' || #{search} || '%'
+			    ]]>
+	    	</when>
+	    	<when test="category=='qna_content'">	<!-- 내용별 검색 -->
+				<![CDATA[		
+					WHERE QNA_CONTENT LIKE '%' || #{search} || '%'
+			    ]]>
+	    	</when>
+	    	<when test="category=='qna_name'">		<!-- 이름별 검색 -->
+				<![CDATA[
+					WHERE QNA_NAME LIKE '%' || #{search} || '%'	
+			    ]]>
+	    	</when>
+	    </choose>
+	    	<![CDATA[
+	    			ORDER BY QNA_GROUP DESC, QNA_STEP
+	    			) A
+				)
+			WHERE RNUM >= #{startRow}
+			AND	  RNUM <= #{endRow}
+			]]>
+	</select>
+	
+	<!-- qna category별 검색한 수 -->
+	<select id="selectQnaSearchCount" resultType="int">
+		<![CDATA[   
+			SELECT COUNT(*)
+			FROM   QNA
+	    ]]>
+	    <choose>
+			<when test="category=='qna_title'">		<!-- 제목별 검색 --> 
+				<![CDATA[ 
+					WHERE QNA_TITLE LIKE '%' || #{search} || '%'
+		    	]]>
+	    	</when>
+	    	<when test="category=='qna_content'">	<!-- 내용별 검색 --> 
+				<![CDATA[ 
+					WHERE QNA_CONTENT LIKE '%' || #{search} || '%'
+		    	]]>
+	    	</when>
+	    	<when test="category=='qna_name'">		<!-- 이름별 검색 --> 
+				<![CDATA[ 
+					WHERE QNA_NAME LIKE '%' || #{search} || '%'
+		    	]]>
+	    	</when>
+	    </choose>
+	</select>
+	
+	<!-- qna 쓰기 저장 -->
+	<insert id="insertQnaWriteDo"> 
+	   INSERT INTO QNA 
+	    VALUES
+	   (SEQ_QNA_NO.NEXTVAL, #{email}, #{qna_name}, #{qna_title},
+	   #{qna_content}, SYSDATE, 0, SEQ_QNA_NO.CURRVAL,
+	   0, 0, #{qna_secret_code}, #{qna_name})
+	</insert>
+	
+	<!-- 조회수 1 증가 -->
+	<update id="updateHit">
+		UPDATE QNA
+		SET    QNA_HIT = QNA_HIT + 1
+		WHERE  QNA_NO = #{qna_no}
+	</update>
+	
+	<!-- 뷰페이지 호출 -->
+	<select id="selectQnaView" resultType="com.site.vo.QnaVo">
+		<![CDATA[	
+			SELECT *
+			FROM   QNA
+			WHERE  QNA_NO = #{qna_no}
+	    ]]>
+	</select>
+	
+	<!-- 이전글 -->
+	<select id="selectQnaViewPre" resultType="com.site.vo.QnaVo">
+		<![CDATA[	
+			SELECT *
+			FROM
+			(
+				SELECT ROWNUM RNUM, A.*
+				FROM
+				(
+					SELECT *
+					FROM QNA
+					ORDER BY QNA_GROUP DESC, QNA_STEP
+				) A
+			)
+			WHERE RNUM =
+			(
+				SELECT RNUM
+				FROM
+				(
+					SELECT ROWNUM RNUM, A.*
+					FROM
+					(
+						SELECT * 
+						FROM QNA
+						ORDER BY QNA_GROUP DESC, QNA_STEP
+					) a
+				)
+				WHERE QNA_NO = #{qna_no}
+			) - 1
+		]]>
+	</select>
+	
+	<!-- 다음글 -->
+	<select id="selectQnaViewNext" resultType="com.site.vo.QnaVo">
+		<![CDATA[
+		    SELECT *
+			FROM
+			(
+				SELECT ROWNUM RNUM, A.*
+				FROM
+				(
+					SELECT *
+					FROM QNA
+					ORDER BY QNA_GROUP DESC, QNA_STEP
+				) A
+			)
+			WHERE RNUM =
+			(
+				SELECT RNUM
+				FROM
+				(
+					SELECT ROWNUM RNUM, A.*
+					FROM
+					(
+						SELECT * 
+						FROM QNA
+						ORDER BY QNA_GROUP DESC, QNA_STEP
+					) a
+				)
+				WHERE QNA_NO = #{qna_no}
+			) + 1
+		]]>
+	</select>
+	
+	<!-- qna 글 삭제 -->
+	<delete id="deleteQnaDelete">
+		DELETE QNA
+		WHERE  QNA_NO = #{qna_no}
+	</delete>
+	
+	<!-- qna 수정페이지 호출 -->
+	<select id="selectQnaModify" resultType="com.site.vo.QnaVo">
+		SELECT *
+		FROM   QNA
+		WHERE  QNA_NO = #{qna_no}
+	</select>
+	
+	<!-- qna 수정 저장 -->
+	<update id="updateQnaModifyDo">
+		UPDATE QNA
+		SET	   QNA_TITLE = #{qna_title},
+			   QNA_CONTENT = #{qna_content},
+			   QNA_DATE = SYSDATE
+		WHERE  QNA_NO = #{qna_no}
+	</update>
+	
+	<!-- qna 답글 저장 -->
+	<insert id="insertQnaReplyDo">
+		INSERT INTO QNA
+		VALUES
+		(SEQ_QNA_NO.NEXTVAL, #{email}, #{qna_name},
+		#{qna_title}, #{qna_content}, 
+		SYSDATE, 0, #{qna_group}, 
+		#{qna_step} + 1, #{qna_indent} + 1, #{qna_secret_code}, #{qna_original_name})		
+	</insert>
+	
+	<!-- qna step 1 증가 -->
+	<update id="updateQnaReplyDoPlus">
+	   UPDATE QNA
+	   SET	  QNA_STEP = QNA_STEP + 1
+	   WHERE  QNA_GROUP = #{qna_group}
+	   AND	  QNA_STEP > #{qna_step}
+	</update>
+	
+</mapper>

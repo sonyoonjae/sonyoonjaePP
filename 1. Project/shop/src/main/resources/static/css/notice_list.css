@@ -1,0 +1,110 @@
+/* Main Section */
+section {
+  text-align: center;
+  position: relative;
+}
+
+
+h1#notice_h1{
+    margin: 40px auto 50px auto;
+    font-size: 51px;
+    width: 161px;
+    height: 76px;
+}
+
+h1#qna{
+    margin-top: 40px;
+    margin-bottom: 50px;
+    font-size: 40px;
+}
+.wrapper {
+  position: relative;
+  height: 1px;
+}
+
+select {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 80px;
+  height: 40px;
+  margin-left: -185px;
+  margin-top: -20px;
+  
+  padding: 5px;
+  border: 1px solid #666666;
+  font-family: inherit;
+  background: url(https://www.midashotel.co.kr/Midas_common/images/homepage/board/search-box-select.png) no-repeat 95% 50%;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+select::-ms-expand {
+  display: none;
+}
+
+form > div {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200px;
+  height: 38px;
+  margin-left: -100px;
+  margin-top: -20px;
+
+  display: inline-block;
+  border: 1px solid #666666;
+}
+
+input {
+    position: relative;
+    top: 3px;
+    left: 1px;
+    border: none;
+    font-size: 19px;
+}
+
+input:active,
+input:focus,
+input:hover {
+  outline: none;
+}
+
+table {
+  width: 96%;
+  margin-top: 80px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 40px;
+  border-collapse: collapse;
+}
+
+.table-notice {
+  color: black;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.table-title {
+  text-align: left;
+}
+
+th {
+  border: 1px solid silver;
+  border-top: 2px solid black;
+}
+
+td {
+  border: 1px solid silver;
+}
+
+
+th,
+td {
+  border-left: hidden;
+  border-right: hidden;
+}
+a:link { color: black; text-decoration: none;}
+a:visited { color: black; text-decoration: none;}
+td a:hover { color:#ef5a5a; }

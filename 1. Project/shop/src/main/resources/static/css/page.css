@@ -1,0 +1,63 @@
+@charset "UTF-8";
+
+ .first {
+  background: url(https://www.midashotel.co.kr/Midas_common/images/homepage/board/paging_first.png) no-repeat;
+  height: 35px;
+	width: 36px;
+	float: left;
+	cursor:pointer;
+}
+
+.prev {
+	background: url(https://www.midashotel.co.kr/Midas_common/images/homepage/board/paging_prev.png) no-repeat;
+	height: 35px;
+	width: 36px;
+	float: left;
+	cursor:pointer;
+}
+
+.num {
+  top: -15px;
+  height: 33px !important;
+  float : left;
+  width: 30px;
+  text-align: center;
+  
+}
+
+ul.page-num li {
+    margin: 0px 10px;
+    cursor:default;
+    color:#ef5a5a;
+}
+
+
+.num > div {
+  position: relative;
+  top: -4px;
+  font-size:28px;
+  font-family: 'Noto Sans KR', sans-serif;
+} 
+
+.num a div {
+  position: relative;
+  top: -4px;
+  font-size:28px;
+  font-family: 'Noto Sans KR', sans-serif;
+} 
+
+.next {
+  background: url(https://www.midashotel.co.kr/Midas_common/images/homepage/board/paging_next.png) no-repeat;
+	height: 35px;
+	width: 36px;
+	float: left;
+	cursor:pointer;
+}
+
+.last {
+  background: url(https://www.midashotel.co.kr/Midas_common/images/homepage/board/paging_last.png) no-repeat;
+	height: 35px;
+	width: 36px;
+	float: left;
+	cursor:pointer;
+}
